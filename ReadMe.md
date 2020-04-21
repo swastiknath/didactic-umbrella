@@ -55,27 +55,27 @@ bash run_dags.sh
 
 In order to handle the data pipeline using Apache Airflow we have written down a few python scripts which are in the **dags** directory. The 3 main DAGs are written to handle the processing pipeline. 
 
-    1. **dag_cluster**: start the EMR cluster, and wait for all data transformation is finished, then terminate the cluster.
+   1. **dag_cluster**: start the EMR cluster, and wait for all data transformation is finished, then terminate the cluster.
     
-    2. **dag_normalize**: wait for EMR cluster to be ready, then use Apache Livy REST API to create interactive Spark session on the cluster, submit a Spark script to read data from S3, do transformation and write the output to S3. This DAG handles normalized tables.
+   2. **dag_normalize**: wait for EMR cluster to be ready, then use Apache Livy REST API to create interactive Spark session on the cluster, submit a Spark script to read data from S3, do transformation and write the output to S3. This DAG handles normalized tables.
     
-    3. **dag_analytics**: wait for EMR cluster to be ready, and that normalized tables are processed, then read normalized tables to create analytics tables, and write to S3.This DAG handles immigration data, which is partitioned for 12 months from jan-2016 to dec-2016.To re-run this DAG, change the DAG name, then delete the existing DAG from Airflow, and refresh the UI
+   3. **dag_analytics**: wait for EMR cluster to be ready, and that normalized tables are processed, then read normalized tables to create analytics tables, and write to S3.This DAG handles immigration data, which is partitioned for 12 months from jan-2016 to dec-2016.To re-run this DAG, change the DAG name, then delete the existing DAG from Airflow, and refresh the UI
     
 ### Planning to cope with the Scenarios:
 
 1. Data increase by 100x. read > write. write > read
 
-         Redshift: Analytical database, optimized for aggregation, also good performance for read-heavy workloads
-         Cassandra: Is optimized for writes, can be used to write online transactions as it comes in, and later aggregated into analytics tables in Redshift
-         Increase EMR cluster size to handle bigger volume of data
+     - Redshift: Analytical database, optimized for aggregation, also good performance for read-heavy workloads
+     - Cassandra: Is optimized for writes, can be used to write online transactions as it comes in, and later aggregated into analytics tables in Redshift
+     - Increase EMR cluster size to handle bigger volume of data
 
 2. Pipelines would be run on 7am daily. how to update dashboard? would it still work?
 
-        DAG retries, or send emails on failures
-        Daily intervals with quality checks
-        if checks fail, then send emails to operators, freeze dashboard, look at DAG logs to figure out what went wrong
+      - DAG retries, or send emails on failures
+      - Daily intervals with quality checks
+      - if checks fail, then send emails to operators, freeze dashboard, look at DAG logs to figure out what went wrong
 
 3. Make it available to 100+ people
 
-        Redshift with auto-scaling capabilities and good read performance
-        Cassandra with pre-defined indexes to optimize read queries
+      - Redshift with auto-scaling capabilities and good read performance
+      - Cassandra with pre-defined indexes to optimize read queries
