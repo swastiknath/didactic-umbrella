@@ -56,11 +56,12 @@ bash run_dags.sh
 In order to handle the data pipeline using Apache Airflow we have written down a few python scripts which are in the **dags** directory. The 3 main DAGs are written to handle the processing pipeline. 
 
    1. **dag_cluster**: start the EMR cluster, and wait for all data transformation is finished, then terminate the cluster.
+   ![](cluster-dag.png)
     
    2. **dag_normalize**: wait for EMR cluster to be ready, then use Apache Livy REST API to create interactive Spark session on the cluster, submit a Spark script to read data from S3, do transformation and write the output to S3. This DAG handles normalized tables.
-    
+    ![](normalize_dag.png)
    3. **dag_analytics**: wait for EMR cluster to be ready, and that normalized tables are processed, then read normalized tables to create analytics tables, and write to S3.This DAG handles immigration data, which is partitioned for 12 months from jan-2016 to dec-2016.To re-run this DAG, change the DAG name, then delete the existing DAG from Airflow, and refresh the UI
-    
+    ![](analytics_dag.png)
 ### Planning to cope with the Scenarios:
 
 1. Data increase by 100x. read > write. write > read
